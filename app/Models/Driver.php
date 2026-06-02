@@ -42,6 +42,8 @@ class Driver extends Model
     /** @use HasFactory<DriverFactory> */
     use HasFactory;
 
+    public const PHOTO_DISK = 'local';
+
     /**
      * @var array<string, string>
      */
@@ -62,11 +64,6 @@ class Driver extends Model
     public function documentDirectory(): string
     {
         return 'driver-documents/driver-'.$this->id.'-'.Str::slug($this->legal_name);
-    }
-
-    public static function photoDisk(): string
-    {
-        return (string) config('filesystems.driver_photos_disk', 'local');
     }
 
     /**

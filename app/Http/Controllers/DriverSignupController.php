@@ -166,7 +166,7 @@ class DriverSignupController extends Controller
         $path = $photo->storeAs(
             'driver-signup-drafts/'.$draftId,
             $inputName.'.'.$extension,
-            ['disk' => Driver::photoDisk()],
+            ['disk' => Driver::PHOTO_DISK],
         );
 
         if ($path === false) {
@@ -182,7 +182,7 @@ class DriverSignupController extends Controller
      */
     private function moveDraftPhotosToDriver(Driver $driver, array $photos): array
     {
-        $disk = Storage::disk(Driver::photoDisk());
+        $disk = Storage::disk(Driver::PHOTO_DISK);
         $photoPaths = [];
 
         foreach ($photos as $inputName => $draftPath) {
@@ -207,7 +207,7 @@ class DriverSignupController extends Controller
     private function deleteDraftPhoto(?string $path): void
     {
         if ($path !== null) {
-            Storage::disk(Driver::photoDisk())->delete($path);
+            Storage::disk(Driver::PHOTO_DISK)->delete($path);
         }
     }
 

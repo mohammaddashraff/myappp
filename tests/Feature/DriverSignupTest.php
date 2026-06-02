@@ -81,7 +81,7 @@ test('driver can complete multi step signup without optional photos', function (
 });
 
 test('uploaded driver photos are stored in a per-driver local folder', function () {
-    Storage::fake(Driver::photoDisk());
+    Storage::fake(Driver::PHOTO_DISK);
 
     $this->post(route('drivers.signup.step.store', 'identity'), validDriverIdentityPayload())
         ->assertRedirect(route('drivers.signup.step', 'contact'));
@@ -106,6 +106,6 @@ test('uploaded driver photos are stored in a per-driver local folder', function 
         ->and($driver->vehicle_front_photo_path)->not->toBeNull()
         ->and(Str::contains($driver->national_id_front_photo_path, 'driver-'.$driver->id.'-ahmed-mohamed-hassan'))->toBeTrue();
 
-    Storage::disk(Driver::photoDisk())->assertExists($driver->national_id_front_photo_path);
-    Storage::disk(Driver::photoDisk())->assertExists($driver->vehicle_front_photo_path);
+    Storage::disk(Driver::PHOTO_DISK)->assertExists($driver->national_id_front_photo_path);
+    Storage::disk(Driver::PHOTO_DISK)->assertExists($driver->vehicle_front_photo_path);
 });
