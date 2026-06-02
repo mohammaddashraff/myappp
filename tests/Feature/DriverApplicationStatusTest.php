@@ -14,8 +14,8 @@ test('pending driver can view application status page', function () {
 
     $response
         ->assertOk()
-        ->assertSee('Your application is being reviewed')
-        ->assertSee('Application #'.$driver->id)
+        ->assertSee('طلبك قيد المراجعة')
+        ->assertSee('طلب رقم #'.$driver->id)
         ->assertSee('Ahmed Mohamed Hassan');
 });
 
@@ -39,11 +39,30 @@ test('user without driver application is redirected home from status page', func
         ->assertRedirect(route('drivers.dashboard'));
 });
 
-test('authenticated driver can view the placeholder dashboard', function () {
+test('authenticated user without application can view the placeholder dashboard', function () {
     $user = User::factory()->create();
 
     $this->actingAs($user)
         ->get(route('drivers.dashboard'))
         ->assertOk()
-        ->assertSee('Your driver dashboard is being prepared');
+        ->assertSee('لوحة السائق الخاصة بك قيد التجهيز')
+        ->assertSee('لا يوجد طلب سائق مرتبط بهذا الحساب حتى الآن.');
+});
+
+test('driver dashboard shows the linked application status', function () {
+    $user = User::factory()->create();
+
+    Driver::factory()->for($user)->create([
+        'approval_status' => 'pending',
+        'legal_name' => 'Ahmed Mohamed Hassan',
+        'plate_number' => 'GZ-2458',
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('drivers.dashboard'))
+        ->assertOk()
+        ->assertSee('حالة الطلب')
+        ->assertSee('قيد المراجعة')
+        ->assertSee('Ahmed Mohamed Hassan')
+        ->assertSee('GZ-2458');
 });

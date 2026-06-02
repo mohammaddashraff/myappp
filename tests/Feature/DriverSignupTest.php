@@ -61,9 +61,9 @@ test('driver signup starts on the account step for guests', function () {
 
     $response
         ->assertOk()
-        ->assertSee('Step 1: Account')
-        ->assertSee('Email address')
-        ->assertSee('Password');
+        ->assertSee('الخطوة 1: الحساب')
+        ->assertSee('البريد الإلكتروني')
+        ->assertSee('كلمة المرور');
 });
 
 test('guest driver cannot skip the account step', function () {

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DriverApplicationStatusController;
+use App\Http\Controllers\DriverDashboardController;
 use App\Http\Controllers\DriverSignupController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -28,7 +29,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::view('/drivers/dashboard', 'drivers.dashboard')
+    Route::get('/drivers/dashboard', DriverDashboardController::class)
         ->name('drivers.dashboard');
 
     Route::get('/drivers/application/status', DriverApplicationStatusController::class)

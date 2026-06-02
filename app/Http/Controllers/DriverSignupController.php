@@ -28,33 +28,33 @@ class DriverSignupController extends Controller
     private const STEPS = [
         'account' => [
             'number' => 1,
-            'title' => 'Account',
-            'subtitle' => 'Email and password for sign in',
+            'title' => 'الحساب',
+            'subtitle' => 'البريد الإلكتروني وكلمة المرور لتسجيل الدخول',
         ],
         'identity' => [
             'number' => 2,
-            'title' => 'Legal identity',
-            'subtitle' => 'Name, date of birth, and address',
+            'title' => 'الهوية القانونية',
+            'subtitle' => 'الاسم وتاريخ الميلاد والعنوان',
         ],
         'contact' => [
             'number' => 3,
-            'title' => 'Contact',
-            'subtitle' => 'Phone numbers and emergency contact',
+            'title' => 'بيانات التواصل',
+            'subtitle' => 'أرقام الهاتف وجهة اتصال الطوارئ',
         ],
         'documents' => [
             'number' => 4,
-            'title' => 'Documents',
-            'subtitle' => 'ID, selfie, licenses, and checks',
+            'title' => 'المستندات',
+            'subtitle' => 'البطاقة والصورة الشخصية والرخص والفحوصات',
         ],
         'vehicle' => [
             'number' => 5,
-            'title' => 'Motorcycle',
-            'subtitle' => 'Plate, ownership, and equipment',
+            'title' => 'الموتوسيكل',
+            'subtitle' => 'اللوحة والملكية والمعدات',
         ],
         'review' => [
             'number' => 6,
-            'title' => 'Review',
-            'subtitle' => 'Consent and submit',
+            'title' => 'المراجعة',
+            'subtitle' => 'الموافقة وإرسال الطلب',
         ],
     ];
 
@@ -140,7 +140,7 @@ class DriverSignupController extends Controller
         $validated = $request->validated();
 
         $user = User::create([
-            'name' => 'Driver applicant',
+            'name' => 'متقدم كسائق',
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
         ]);

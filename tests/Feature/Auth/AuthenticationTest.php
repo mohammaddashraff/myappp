@@ -21,7 +21,7 @@ test('users can authenticate using the login screen', function () {
     $response->assertRedirect(route('drivers.dashboard', absolute: false));
 });
 
-test('pending drivers are redirected to their application status after login', function () {
+test('pending drivers are redirected to their dashboard after login', function () {
     $user = User::factory()->create();
 
     Driver::factory()->for($user)->create([
@@ -34,7 +34,7 @@ test('pending drivers are redirected to their application status after login', f
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('drivers.application.status', absolute: false));
+    $response->assertRedirect(route('drivers.dashboard', absolute: false));
 });
 
 test('users can not authenticate with invalid password', function () {
