@@ -25,7 +25,12 @@
                 @if (Route::has('login'))
                     <div class="flex items-center gap-2">
                         @auth
-                            <a href="{{ url('/dashboard') }}" class="rounded-xl px-4 py-2 text-sm font-bold text-zinc-200 transition hover:bg-white/10 hover:text-white">Dashboard</a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="rounded-xl px-4 py-2 text-sm font-bold text-zinc-200 transition hover:bg-white/10 hover:text-white">
+                                    Log out
+                                </button>
+                            </form>
                         @else
                             <a href="{{ route('login') }}" class="rounded-xl px-4 py-2 text-sm font-bold text-zinc-200 transition hover:bg-white/10 hover:text-white">Login</a>
                         @endauth

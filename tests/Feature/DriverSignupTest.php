@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Driver;
+use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -43,19 +44,39 @@ function validDriverReviewPayload(array $overrides = []): array
     ], $overrides);
 }
 
-test('driver signup starts on the identity step', function () {
-    $this->get(route('drivers.signup.create'))
-        ->assertRedirect(route('drivers.signup.step', 'identity'));
+function validDriverAccountPayload(array $overrides = []): array
+{
+    return array_merge([
+        'email' => 'driver@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+    ], $overrides);
+}
 
-    $response = $this->get(route('drivers.signup.step', 'identity'));
+test('driver signup starts on the account step for guests', function () {
+    $this->get(route('drivers.signup.create'))
+        ->assertRedirect(route('drivers.signup.step', 'account'));
+
+    $response = $this->get(route('drivers.signup.step', 'account'));
 
     $response
         ->assertOk()
-        ->assertSee('Step 1: Legal identity')
-        ->assertSee('Full legal name');
+        ->assertSee('Step 1: Account')
+        ->assertSee('Email address')
+        ->assertSee('Password');
+});
+
+test('guest driver cannot skip the account step', function () {
+    $this->post(route('drivers.signup.step.store', 'identity'), validDriverIdentityPayload())
+        ->assertRedirect(route('drivers.signup.step', 'account'));
 });
 
 test('driver can complete multi step signup without optional photos', function () {
+    $this->post(route('drivers.signup.step.store', 'account'), validDriverAccountPayload())
+        ->assertRedirect(route('drivers.signup.step', 'identity'));
+
+    $this->assertAuthenticated();
+
     $this->post(route('drivers.signup.step.store', 'identity'), validDriverIdentityPayload())
         ->assertRedirect(route('drivers.signup.step', 'contact'));
 
@@ -72,16 +93,55 @@ test('driver can complete multi step signup without optional photos', function (
         ->assertRedirect(route('drivers.signup.success'));
 
     $this->assertDatabaseHas('drivers', [
+        'user_id' => auth()->id(),
         'legal_name' => 'Ahmed Mohamed Hassan',
         'phone_number' => '+201012345678',
         'approval_status' => 'pending',
         'national_id_front_photo_path' => null,
         'vehicle_front_photo_path' => null,
     ]);
+
+    $this->assertDatabaseHas('users', [
+        'email' => 'driver@example.com',
+        'name' => 'Ahmed Mohamed Hassan',
+    ]);
+});
+
+test('logged in driver signup is linked to the user account', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->post(route('drivers.signup.step.store', 'identity'), validDriverIdentityPayload())
+        ->assertRedirect(route('drivers.signup.step', 'contact'));
+
+    $this->actingAs($user)
+        ->post(route('drivers.signup.step.store', 'contact'), validDriverContactPayload())
+        ->assertRedirect(route('drivers.signup.step', 'documents'));
+
+    $this->actingAs($user)
+        ->post(route('drivers.signup.step.store', 'documents'), [])
+        ->assertRedirect(route('drivers.signup.step', 'vehicle'));
+
+    $this->actingAs($user)
+        ->post(route('drivers.signup.step.store', 'vehicle'), validDriverVehiclePayload())
+        ->assertRedirect(route('drivers.signup.step', 'review'));
+
+    $this->actingAs($user)
+        ->post(route('drivers.signup.step.store', 'review'), validDriverReviewPayload())
+        ->assertRedirect(route('drivers.signup.success'));
+
+    $this->assertDatabaseHas('drivers', [
+        'user_id' => $user->id,
+        'phone_number' => '+201012345678',
+        'approval_status' => 'pending',
+    ]);
 });
 
 test('uploaded driver photos are stored in a per-driver local folder', function () {
     Storage::fake(Driver::PHOTO_DISK);
+
+    $this->post(route('drivers.signup.step.store', 'account'), validDriverAccountPayload())
+        ->assertRedirect(route('drivers.signup.step', 'identity'));
 
     $this->post(route('drivers.signup.step.store', 'identity'), validDriverIdentityPayload())
         ->assertRedirect(route('drivers.signup.step', 'contact'));

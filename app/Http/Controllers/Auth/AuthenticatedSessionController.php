@@ -28,7 +28,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        if ($request->user()->driverApplication?->approval_status === 'pending') {
+            return redirect()->route('drivers.application.status');
+        }
+
+        return redirect()->route('drivers.dashboard');
     }
 
     /**

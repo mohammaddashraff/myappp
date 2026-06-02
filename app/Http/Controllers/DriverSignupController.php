@@ -4,10 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreDriverSignupRequest;
 use App\Models\Driver;
+use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -22,28 +26,33 @@ class DriverSignupController extends Controller
      * @var array<string, array{number: int, title: string, subtitle: string}>
      */
     private const STEPS = [
-        'identity' => [
+        'account' => [
             'number' => 1,
+            'title' => 'Account',
+            'subtitle' => 'Email and password for sign in',
+        ],
+        'identity' => [
+            'number' => 2,
             'title' => 'Legal identity',
             'subtitle' => 'Name, date of birth, and address',
         ],
         'contact' => [
-            'number' => 2,
+            'number' => 3,
             'title' => 'Contact',
             'subtitle' => 'Phone numbers and emergency contact',
         ],
         'documents' => [
-            'number' => 3,
+            'number' => 4,
             'title' => 'Documents',
             'subtitle' => 'ID, selfie, licenses, and checks',
         ],
         'vehicle' => [
-            'number' => 4,
+            'number' => 5,
             'title' => 'Motorcycle',
             'subtitle' => 'Plate, ownership, and equipment',
         ],
         'review' => [
-            'number' => 5,
+            'number' => 6,
             'title' => 'Review',
             'subtitle' => 'Consent and submit',
         ],
@@ -57,12 +66,19 @@ class DriverSignupController extends Controller
 
         $this->draft($request);
 
-        return redirect()->route('drivers.signup.step', 'identity');
+        return redirect()->route(
+            'drivers.signup.step',
+            $request->user() === null ? 'account' : 'identity',
+        );
     }
 
-    public function show(Request $request, string $step): View
+    public function show(Request $request, string $step): RedirectResponse|View
     {
         $this->ensureValidStep($step);
+
+        if ($request->user() === null && $step !== 'account') {
+            return redirect()->route('drivers.signup.step', 'account');
+        }
 
         return view('drivers.signup', [
             'draft' => $this->draft($request),
@@ -75,6 +91,14 @@ class DriverSignupController extends Controller
     {
         $step = (string) $request->route('step');
         $this->ensureValidStep($step);
+
+        if ($request->user() === null && $step !== 'account') {
+            return redirect()->route('drivers.signup.step', 'account');
+        }
+
+        if ($step === 'account') {
+            return $this->createDriverAccount($request);
+        }
 
         if ($step === 'review') {
             return $this->submitApplication($request);
@@ -107,6 +131,29 @@ class DriverSignupController extends Controller
         return view('drivers.success');
     }
 
+    private function createDriverAccount(StoreDriverSignupRequest $request): RedirectResponse
+    {
+        if ($request->user() !== null) {
+            return redirect()->route('drivers.signup.step', 'identity');
+        }
+
+        $validated = $request->validated();
+
+        $user = User::create([
+            'name' => 'Driver applicant',
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        event(new Registered($user));
+
+        Auth::login($user);
+        $request->session()->regenerate();
+        $this->draft($request);
+
+        return redirect()->route('drivers.signup.step', 'identity');
+    }
+
     private function submitApplication(StoreDriverSignupRequest $request): RedirectResponse
     {
         $draft = $this->draft($request);
@@ -124,6 +171,22 @@ class DriverSignupController extends Controller
         $driverData['consented_to_background_check'] = true;
         $driverData['accepted_terms'] = true;
         $driverData['submitted_at'] = now();
+
+        $user = $request->user();
+
+        if ($user?->driverApplication !== null) {
+            return $user->driverApplication->approval_status === 'pending'
+                ? redirect()->route('drivers.application.status')
+                : redirect()->route('drivers.dashboard');
+        }
+
+        if ($user !== null) {
+            $driverData['user_id'] = $user->id;
+
+            $user->forceFill([
+                'name' => $driverData['legal_name'],
+            ])->save();
+        }
 
         $driver = Driver::create($driverData);
         $photoPaths = $this->moveDraftPhotosToDriver($driver, $draft['photos'] ?? []);

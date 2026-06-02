@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Driver;
 use App\Models\User;
 
 test('login screen can be rendered', function () {
@@ -17,7 +18,23 @@ test('users can authenticate using the login screen', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $response->assertRedirect(route('drivers.dashboard', absolute: false));
+});
+
+test('pending drivers are redirected to their application status after login', function () {
+    $user = User::factory()->create();
+
+    Driver::factory()->for($user)->create([
+        'approval_status' => 'pending',
+    ]);
+
+    $response = $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertAuthenticated();
+    $response->assertRedirect(route('drivers.application.status', absolute: false));
 });
 
 test('users can not authenticate with invalid password', function () {

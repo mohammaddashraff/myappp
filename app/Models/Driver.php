@@ -6,9 +6,11 @@ use Database\Factories\DriverFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 
 #[Fillable([
+    'user_id',
     'legal_name',
     'date_of_birth',
     'current_address',
@@ -60,6 +62,14 @@ class Driver extends Model
         'vehicle_back_photo' => 'vehicle_back_photo_path',
         'delivery_box_photo' => 'delivery_box_photo_path',
     ];
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function documentDirectory(): string
     {

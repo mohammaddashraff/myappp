@@ -3,7 +3,11 @@
     $currentIndex = array_search($step, $stepKeys, true);
     $currentStep = $steps[$step];
     $previousStep = $currentIndex > 0 ? $stepKeys[$currentIndex - 1] : null;
-    $nextLabel = $step === 'review' ? 'Submit application' : 'Continue';
+    $nextLabel = match ($step) {
+        'account' => auth()->check() ? 'Continue' : 'Create account',
+        'review' => 'Submit application',
+        default => 'Continue',
+    };
     $fieldValue = fn (string $name): mixed => old($name, data_get($draft, 'fields.'.$name, ''));
     $photoPath = fn (string $name): ?string => data_get($draft, 'photos.'.$name);
 
@@ -123,7 +127,46 @@
                         </div>
 
                         <div class="mt-8">
-                            @if ($step === 'identity')
+                            @if ($step === 'account')
+                                <section>
+                                    <div class="mb-5">
+                                        <h3 class="text-lg font-extrabold text-zinc-950">Sign-in account</h3>
+                                        <p class="mt-1 text-sm text-zinc-500">Create the account you will use later to check the driver application status.</p>
+                                    </div>
+
+                                    @auth
+                                        <div class="rounded-2xl border border-teal-200 bg-teal-50 p-5">
+                                            <p class="text-sm font-black uppercase tracking-wide text-teal-700">Account connected</p>
+                                            <p class="mt-2 text-base font-bold text-zinc-950">{{ auth()->user()->email }}</p>
+                                            <p class="mt-2 text-sm leading-6 text-zinc-600">
+                                                This driver application will be linked to your signed-in account.
+                                            </p>
+                                        </div>
+                                    @else
+                                        <div class="grid gap-5">
+                                            <div>
+                                                <x-input-label for="email" value="Email address" />
+                                                <x-text-input id="email" name="email" type="email" class="mt-2 block w-full" :value="old('email')" required autofocus autocomplete="email" />
+                                                <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                                            </div>
+
+                                            <div class="grid gap-5 sm:grid-cols-2">
+                                                <div>
+                                                    <x-input-label for="password" value="Password" />
+                                                    <x-text-input id="password" name="password" type="password" class="mt-2 block w-full" required autocomplete="new-password" />
+                                                    <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                                                </div>
+
+                                                <div>
+                                                    <x-input-label for="password_confirmation" value="Confirm password" />
+                                                    <x-text-input id="password_confirmation" name="password_confirmation" type="password" class="mt-2 block w-full" required autocomplete="new-password" />
+                                                    <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endauth
+                                </section>
+                            @elseif ($step === 'identity')
                                 <section>
                                     <div class="mb-5">
                                         <h3 class="text-lg font-extrabold text-zinc-950">Legal identity</h3>

@@ -3,9 +3,11 @@
 namespace App\Http\Requests;
 
 use App\Models\Driver;
+use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules;
 
 class StoreDriverSignupRequest extends FormRequest
 {
@@ -24,7 +26,13 @@ class StoreDriverSignupRequest extends FormRequest
      */
     public function rules(): array
     {
-        return self::rulesForStep((string) $this->route('step', 'identity'));
+        $step = (string) $this->route('step', 'account');
+
+        if ($step === 'account' && $this->user() !== null) {
+            return [];
+        }
+
+        return self::rulesForStep($step);
     }
 
     /**
@@ -35,6 +43,7 @@ class StoreDriverSignupRequest extends FormRequest
     public static function rulesForStep(string $step): array
     {
         return match ($step) {
+            'account' => self::accountRules(),
             'identity' => self::identityRules(),
             'contact' => self::contactRules(),
             'documents' => self::documentRules(),
@@ -56,6 +65,17 @@ class StoreDriverSignupRequest extends FormRequest
             ...self::contactRules(),
             ...self::vehicleRules(),
             ...self::reviewRules(),
+        ];
+    }
+
+    /**
+     * @return array<string, ValidationRule|array<mixed>|string>
+     */
+    private static function accountRules(): array
+    {
+        return [
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ];
     }
 
@@ -145,6 +165,8 @@ class StoreDriverSignupRequest extends FormRequest
     public function attributes(): array
     {
         return [
+            'email' => 'email address',
+            'password' => 'password',
             'legal_name' => 'full legal name',
             'date_of_birth' => 'date of birth',
             'current_address' => 'current address',
