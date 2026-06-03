@@ -1,6 +1,6 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        هذه منطقة آمنة. يرجى تأكيد كلمة المرور قبل المتابعة.
+    <div class="mb-4 text-sm leading-6 text-slate-600">
+        {{ __('rider.confirm_password_intro') }}
     </div>
 
     <form method="POST" action="{{ route('password.confirm') }}">
@@ -8,9 +8,9 @@
 
         <!-- Password -->
         <div>
-            <x-input-label for="password" value="كلمة المرور" />
+            <x-input-label for="password" :value="__('rider.password')" />
 
-            <x-text-input id="password" class="block mt-1 w-full"
+            <x-text-input id="password" class="mt-1 block w-full"
                             type="password"
                             name="password"
                             required autocomplete="current-password" />
@@ -18,9 +18,9 @@
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
-        <div class="flex justify-end mt-4">
+        <div class="mt-4 flex justify-end">
             <x-primary-button>
-                تأكيد
+                {{ __('rider.confirm') }}
             </x-primary-button>
         </div>
     </form>

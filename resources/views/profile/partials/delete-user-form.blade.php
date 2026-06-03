@@ -1,10 +1,10 @@
 <section class="space-y-6">
     <header>
-        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+        <h2 class="text-lg font-bold text-slate-950">
             حذف الحساب
         </h2>
 
-        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+        <p class="mt-1 text-sm leading-6 text-slate-600">
             عند حذف الحساب سيتم حذف كل البيانات المرتبطة به نهائيا. يرجى التأكد قبل المتابعة.
         </p>
     </header>
@@ -19,11 +19,11 @@
             @csrf
             @method('delete')
 
-            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+            <h2 class="text-lg font-bold text-slate-950">
                 هل أنت متأكد من حذف الحساب؟
             </h2>
 
-            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            <p class="mt-1 text-sm leading-6 text-slate-600">
                 سيتم حذف الحساب وكل بياناته نهائيا. أدخل كلمة المرور لتأكيد الحذف.
             </p>
 

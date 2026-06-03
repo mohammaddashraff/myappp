@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -24,6 +25,22 @@ class User extends Authenticatable
     public function driverApplication(): HasOne
     {
         return $this->hasOne(Driver::class);
+    }
+
+    /**
+     * @return HasOne<Rider, $this>
+     */
+    public function rider(): HasOne
+    {
+        return $this->hasOne(Rider::class);
+    }
+
+    /**
+     * @return HasManyThrough<Motorcycle, Rider, $this>
+     */
+    public function motorcycles(): HasManyThrough
+    {
+        return $this->hasManyThrough(Motorcycle::class, Rider::class);
     }
 
     /**

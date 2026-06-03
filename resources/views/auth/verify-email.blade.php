@@ -1,11 +1,11 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        شكرا لتسجيلك. يرجى تأكيد بريدك الإلكتروني من خلال الرابط الذي أرسلناه لك. إذا لم يصلك البريد يمكننا إرسال رابط جديد.
+    <div class="mb-4 text-sm leading-6 text-slate-600">
+        {{ __('rider.verify_email_intro') }}
     </div>
 
     @if (session('status') == 'verification-link-sent')
-        <div class="mb-4 font-medium text-sm text-green-600 dark:text-green-400">
-            تم إرسال رابط تحقق جديد إلى البريد الإلكتروني الذي استخدمته أثناء التسجيل.
+        <div class="mb-4 text-sm font-bold text-teal-700">
+            {{ __('rider.verification_link_sent') }}
         </div>
     @endif
 
@@ -15,7 +15,7 @@
 
             <div>
                 <x-primary-button>
-                إعادة إرسال رابط التحقق
+                    {{ __('rider.resend_verification_link') }}
                 </x-primary-button>
             </div>
         </form>
@@ -23,8 +23,8 @@
         <form method="POST" action="{{ route('logout') }}">
             @csrf
 
-            <button type="submit" class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
-                تسجيل الخروج
+            <button type="submit" class="rounded-md text-sm font-bold text-slate-600 underline transition hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+                {{ __('rider.logout') }}
             </button>
         </form>
     </div>

@@ -1,6 +1,6 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        أدخل بريدك الإلكتروني وسنرسل لك رابطا لإعادة تعيين كلمة المرور.
+    <div class="mb-4 text-sm leading-6 text-slate-600">
+        {{ __('rider.forgot_password_intro') }}
     </div>
 
     <!-- Session Status -->
@@ -11,14 +11,14 @@
 
         <!-- Email Address -->
         <div>
-            <x-input-label for="email" value="البريد الإلكتروني" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus dir="ltr" />
+            <x-input-label for="email" :value="__('rider.email')" />
+            <x-text-input id="email" class="mt-1 block w-full" type="email" name="email" :value="old('email')" required autofocus dir="ltr" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
+        <div class="mt-4 flex items-center justify-end">
             <x-primary-button>
-                إرسال رابط إعادة التعيين
+                {{ __('rider.send_reset_link') }}
             </x-primary-button>
         </div>
     </form>

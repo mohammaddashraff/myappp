@@ -12,37 +12,37 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="bg-zinc-950 font-sans text-white antialiased">
-        <main class="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(20,184,166,0.18),_transparent_34rem),linear-gradient(135deg,_#09090b,_#111827_52%,_#172554)] px-5 py-8 sm:px-6 lg:px-8">
+    <body class="bg-slate-50 font-sans text-slate-950 antialiased">
+        <main class="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
             <section class="mx-auto flex min-h-[calc(100vh-4rem)] max-w-5xl items-center">
-                <div class="w-full overflow-hidden rounded-3xl border border-white/10 bg-white text-zinc-950 shadow-2xl shadow-black/30">
+                <div class="w-full overflow-hidden rounded-lg border border-slate-200 bg-white text-slate-950 shadow-sm">
                     <div class="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
-                        <aside class="bg-zinc-950 p-8 text-white sm:p-10">
+                        <aside class="border-b border-slate-200 bg-slate-50 p-8 text-slate-950 sm:p-10 lg:border-b-0 lg:border-e">
                             <a href="{{ route('home') }}" class="inline-flex items-center gap-3">
-                                <span class="flex size-11 items-center justify-center rounded-2xl bg-teal-400 text-lg font-black text-zinc-950 shadow-lg shadow-teal-950/40">ط</span>
+                                <span class="flex size-11 items-center justify-center rounded-lg bg-yellow-300 text-lg font-black text-slate-950 shadow-sm">ط</span>
                                 <span>
-                                    <span class="block text-xl font-extrabold tracking-wide">طياران</span>
-                                    <span class="block text-sm text-teal-100/80">تسجيل السائقين</span>
+                                    <span class="block text-xl font-extrabold">طياران</span>
+                                    <span class="block text-sm text-slate-500">تسجيل السائقين</span>
                                 </span>
                             </a>
 
                             <div class="mt-16 max-w-sm">
-                                <p class="inline-flex rounded-full border border-teal-300/30 bg-teal-300/10 px-3 py-1 text-sm font-bold text-teal-100">
+                                <p class="text-sm font-bold uppercase text-teal-700">
                                     قيد المراجعة
                                 </p>
-                                <h1 class="mt-5 text-4xl font-black leading-tight sm:text-5xl">طلبك قيد المراجعة</h1>
-                                <p class="mt-5 text-base leading-7 text-zinc-300">
+                                <h1 class="mt-3 text-4xl font-black leading-tight text-slate-950 sm:text-5xl">طلبك قيد المراجعة</h1>
+                                <p class="mt-4 text-base leading-7 text-slate-600">
                                     يقوم فريق التشغيل بمراجعة الهوية والرخصة والمركبة ومستندات السلامة.
                                 </p>
                             </div>
                         </aside>
 
                         <div class="p-6 sm:p-8 lg:p-10">
-                            <div class="flex flex-col gap-4 border-b border-zinc-200 pb-6 sm:flex-row sm:items-start sm:justify-between">
+                            <div class="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-start sm:justify-between">
                                 <div>
-                                    <p class="text-sm font-bold uppercase tracking-wide text-teal-700">طلب رقم #{{ $driver->id }}</p>
-                                    <h2 class="mt-1 text-2xl font-black text-zinc-950">{{ $driver->legal_name }}</h2>
-                                    <p class="mt-2 text-sm text-zinc-500">
+                                    <p class="text-sm font-bold uppercase text-teal-700">طلب رقم #{{ $driver->id }}</p>
+                                    <h2 class="mt-1 text-2xl font-black text-slate-950">{{ $driver->legal_name }}</h2>
+                                    <p class="mt-2 text-sm text-slate-500">
                                         تم الإرسال {{ $driver->submitted_at?->format('Y/m/d') ?? 'حديثا' }}
                                     </p>
                                 </div>
@@ -53,42 +53,42 @@
                             </div>
 
                             <div class="mt-8 grid gap-4 sm:grid-cols-2">
-                                <div class="rounded-2xl border border-zinc-200 bg-zinc-50 p-5">
-                                    <p class="text-xs font-black uppercase tracking-wide text-zinc-500">الهاتف</p>
-                                    <p class="mt-2 text-base font-bold text-zinc-950">{{ $driver->phone_number }}</p>
+                                <div class="rounded-lg border border-slate-200 bg-slate-50 p-5">
+                                    <p class="text-xs font-black uppercase text-slate-500">الهاتف</p>
+                                    <p class="mt-2 text-base font-bold text-slate-950">{{ $driver->phone_number }}</p>
                                 </div>
 
-                                <div class="rounded-2xl border border-zinc-200 bg-zinc-50 p-5">
-                                    <p class="text-xs font-black uppercase tracking-wide text-zinc-500">رقم اللوحة</p>
-                                    <p class="mt-2 text-base font-bold text-zinc-950">{{ $driver->plate_number }}</p>
+                                <div class="rounded-lg border border-slate-200 bg-slate-50 p-5">
+                                    <p class="text-xs font-black uppercase text-slate-500">رقم اللوحة</p>
+                                    <p class="mt-2 text-base font-bold text-slate-950">{{ $driver->plate_number }}</p>
                                 </div>
 
-                                <div class="rounded-2xl border border-zinc-200 bg-zinc-50 p-5">
-                                    <p class="text-xs font-black uppercase tracking-wide text-zinc-500">مالك المركبة</p>
-                                    <p class="mt-2 text-base font-bold text-zinc-950">{{ $driver->vehicle_owner_name }}</p>
+                                <div class="rounded-lg border border-slate-200 bg-slate-50 p-5">
+                                    <p class="text-xs font-black uppercase text-slate-500">مالك المركبة</p>
+                                    <p class="mt-2 text-base font-bold text-slate-950">{{ $driver->vehicle_owner_name }}</p>
                                 </div>
 
-                                <div class="rounded-2xl border border-zinc-200 bg-zinc-50 p-5">
-                                    <p class="text-xs font-black uppercase tracking-wide text-zinc-500">جهة اتصال الطوارئ</p>
-                                    <p class="mt-2 text-base font-bold text-zinc-950">{{ $driver->emergency_contact_name }}</p>
+                                <div class="rounded-lg border border-slate-200 bg-slate-50 p-5">
+                                    <p class="text-xs font-black uppercase text-slate-500">جهة اتصال الطوارئ</p>
+                                    <p class="mt-2 text-base font-bold text-slate-950">{{ $driver->emergency_contact_name }}</p>
                                 </div>
                             </div>
 
-                            <div class="mt-8 rounded-2xl bg-zinc-950 p-5 text-white">
-                                <p class="text-sm font-black uppercase tracking-wide text-teal-200">الخطوة التالية</p>
-                                <p class="mt-3 text-sm leading-6 text-zinc-300">
+                            <div class="mt-8 rounded-lg border border-amber-200 bg-amber-50 p-5 text-slate-950">
+                                <p class="text-sm font-black uppercase text-amber-700">الخطوة التالية</p>
+                                <p class="mt-3 text-sm leading-6 text-slate-700">
                                     يرجى إبقاء هاتفك متاحا. بعد موافقة الإدارة ستظهر حالة الطلب في لوحة السائق.
                                 </p>
                             </div>
 
                             <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                <a href="{{ route('home') }}" class="inline-flex justify-center rounded-xl px-5 py-3 text-sm font-bold text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-950">
+                                <a href="{{ route('home') }}" class="inline-flex justify-center rounded-md px-5 py-3 text-sm font-bold text-slate-600 transition hover:bg-slate-100 hover:text-slate-950">
                                     الرئيسية
                                 </a>
 
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit" class="inline-flex w-full justify-center rounded-xl bg-zinc-950 px-5 py-3 text-sm font-black text-white transition hover:bg-zinc-800 sm:w-auto">
+                                    <button type="submit" class="inline-flex w-full justify-center rounded-md bg-slate-950 px-5 py-3 text-sm font-black text-white transition hover:bg-slate-800 sm:w-auto">
                                         تسجيل الخروج
                                     </button>
                                 </form>

@@ -18,10 +18,10 @@ test('users can authenticate using the login screen', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('drivers.dashboard', absolute: false));
+    $response->assertRedirect(route('rider.dashboard', absolute: false));
 });
 
-test('pending drivers are redirected to their dashboard after login', function () {
+test('pending drivers are redirected to rider core after login', function () {
     $user = User::factory()->create();
 
     Driver::factory()->for($user)->create([
@@ -34,7 +34,7 @@ test('pending drivers are redirected to their dashboard after login', function (
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('drivers.dashboard', absolute: false));
+    $response->assertRedirect(route('rider.dashboard', absolute: false));
 });
 
 test('users can not authenticate with invalid password', function () {
