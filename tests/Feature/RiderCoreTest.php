@@ -115,6 +115,7 @@ test('rider can update their profile', function () {
     $this->actingAs($user)
         ->patch(route('rider.profile.update'), [
             'full_name' => 'Updated Rider',
+            'email' => 'updated-rider@example.com',
             'date_of_birth' => '1995-05-12',
             'current_address' => 'Updated Cairo Address',
             'phone_number' => '+201022222222',
@@ -123,7 +124,7 @@ test('rider can update their profile', function () {
             'emergency_contact_relationship' => 'Sister',
             'emergency_contact_phone' => '+201244444444',
         ])
-        ->assertRedirect(route('rider.dashboard'))
+        ->assertRedirect(route('rider.profile.edit'))
         ->assertSessionHasNoErrors();
 
     $this->assertDatabaseHas('riders', [
@@ -138,7 +139,9 @@ test('rider can update their profile', function () {
     ]);
 
     expect($rider->fresh()->profile_completed_at)->not->toBeNull()
-        ->and($user->fresh()->name)->toBe('Updated Rider');
+        ->and($user->fresh()->name)->toBe('Updated Rider')
+        ->and($user->fresh()->email)->toBe('updated-rider@example.com')
+        ->and($user->fresh()->email_verified_at)->toBeNull();
 });
 
 test('rider profile update validates required core fields', function () {
@@ -149,6 +152,7 @@ test('rider profile update validates required core fields', function () {
     $this->actingAs($user)
         ->patch(route('rider.profile.update'), [
             'full_name' => '',
+            'email' => $user->email,
             'current_address' => '',
             'phone_number' => '',
         ])

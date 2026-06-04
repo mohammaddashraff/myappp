@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Rider;
 use App\Models\User;
+use App\Support\AccessRoles;
+use App\Support\RoleRedirector;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Spatie\Permission\Models\Role;
 
 class RegisteredUserController extends Controller
 {
@@ -47,11 +50,13 @@ class RegisteredUserController extends Controller
             'user_id' => $user->id,
             'full_name' => $user->name,
         ]);
+        Role::findOrCreate(AccessRoles::RIDER, 'web');
+        $user->assignRole(AccessRoles::RIDER);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('rider.dashboard', absolute: false));
+        return redirect(route(RoleRedirector::routeNameFor($user), absolute: false));
     }
 }

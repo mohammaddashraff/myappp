@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Support\RoleRedirector;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,7 +29,13 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('rider.dashboard', absolute: false));
+        $redirect = redirect()->intended(route(RoleRedirector::routeNameFor($request->user()), absolute: false));
+
+        if (RoleRedirector::hasInactiveProviderRole($request->user())) {
+            $redirect->with('status', 'Your provider account is not active yet.');
+        }
+
+        return $redirect;
     }
 
     /**

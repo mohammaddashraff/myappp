@@ -43,6 +43,70 @@ class Rider extends Model
     }
 
     /**
+     * @return HasMany<CartItem, $this>
+     */
+    public function cartItems(): HasMany
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
+    /**
+     * @return HasMany<RiderSavedAddress, $this>
+     */
+    public function savedAddresses(): HasMany
+    {
+        return $this->hasMany(RiderSavedAddress::class);
+    }
+
+    /**
+     * @return HasMany<WishlistItem, $this>
+     */
+    public function wishlistItems(): HasMany
+    {
+        return $this->hasMany(WishlistItem::class);
+    }
+
+    /**
+     * @return HasMany<Order, $this>
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
+     * @return HasMany<ServiceBooking, $this>
+     */
+    public function serviceBookings(): HasMany
+    {
+        return $this->hasMany(ServiceBooking::class);
+    }
+
+    /**
+     * @return HasMany<RoadsideRequest, $this>
+     */
+    public function roadsideRequests(): HasMany
+    {
+        return $this->hasMany(RoadsideRequest::class);
+    }
+
+    /**
+     * @return HasMany<BatteryReplacementRequest, $this>
+     */
+    public function batteryReplacementRequests(): HasMany
+    {
+        return $this->hasMany(BatteryReplacementRequest::class);
+    }
+
+    /**
+     * @return HasMany<DealerInquiry, $this>
+     */
+    public function dealerInquiries(): HasMany
+    {
+        return $this->hasMany(DealerInquiry::class);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

@@ -91,6 +91,31 @@
                             </div>
 
                             <div class="rounded-lg border border-slate-200 bg-slate-50 p-5">
+                                <p class="text-xs font-black uppercase text-slate-500">Active orders</p>
+                                <p class="mt-2 text-3xl font-black text-slate-950">{{ $recentOrdersCount }}</p>
+                            </div>
+
+                            <div class="rounded-lg border border-slate-200 bg-slate-50 p-5">
+                                <p class="text-xs font-black uppercase text-slate-500">Service bookings</p>
+                                <p class="mt-2 text-3xl font-black text-slate-950">{{ $activeServiceBookingsCount }}</p>
+                            </div>
+
+                            <div class="rounded-lg border border-slate-200 bg-slate-50 p-5">
+                                <p class="text-xs font-black uppercase text-slate-500">Roadside requests</p>
+                                <p class="mt-2 text-3xl font-black text-slate-950">{{ $activeRoadsideRequestsCount }}</p>
+                            </div>
+
+                            <div class="rounded-lg border border-slate-200 bg-slate-50 p-5">
+                                <p class="text-xs font-black uppercase text-slate-500">Battery requests</p>
+                                <p class="mt-2 text-3xl font-black text-slate-950">{{ $activeBatteryRequestsCount }}</p>
+                            </div>
+
+                            <div class="rounded-lg border border-slate-200 bg-slate-50 p-5">
+                                <p class="text-xs font-black uppercase text-slate-500">Saved addresses</p>
+                                <p class="mt-2 text-3xl font-black text-slate-950">{{ $savedAddressesCount }}</p>
+                            </div>
+
+                            <div class="rounded-lg border border-slate-200 bg-slate-50 p-5">
                                 <p class="text-xs font-black uppercase text-slate-500">{{ __('rider.optional_delivery') }}</p>
                                 <span class="mt-3 inline-flex rounded-full px-4 py-2 text-sm font-black {{ $statusClasses }}">
                                     {{ $statusLabel }}
@@ -106,6 +131,37 @@
                                     {{ $nextStepHelp }}
                                 </p>
                             </div>
+                        </div>
+
+                        <div class="mt-6 rounded-lg border border-slate-200 bg-white p-5">
+                            <div class="flex flex-wrap items-start justify-between gap-3">
+                                <div>
+                                    <p class="text-sm font-black uppercase text-teal-700">Rider activity</p>
+                                    <h2 class="mt-1 text-xl font-black text-slate-950">Recent marketplace orders</h2>
+                                </div>
+                                <a href="{{ route('rider.orders.index') }}" class="inline-flex rounded-md border border-slate-200 px-4 py-2 text-sm font-black text-slate-700">
+                                    View orders
+                                </a>
+                            </div>
+                            <div class="mt-4 divide-y divide-slate-100">
+                                @forelse ($recentOrders as $order)
+                                    <a href="{{ route('rider.orders.show', $order) }}" class="flex items-center justify-between gap-4 py-3 text-sm">
+                                        <span class="font-bold text-slate-950">{{ $order->order_number }}</span>
+                                        <span class="text-slate-500">{{ $order->items->count() }} items · {{ $order->statusLabel() }}</span>
+                                    </a>
+                                @empty
+                                    <p class="py-3 text-sm font-bold text-slate-500">No orders yet.</p>
+                                @endforelse
+                            </div>
+                        </div>
+
+                        <div class="mt-4 flex flex-wrap gap-3">
+                            <a href="{{ route('rider.marketplace') }}" class="inline-flex rounded-md bg-slate-950 px-5 py-3 text-sm font-black text-white">Marketplace</a>
+                            <a href="{{ route('rider.services.index') }}" class="inline-flex rounded-md border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-800">Services</a>
+                            <a href="{{ route('rider.roadside.create') }}" class="inline-flex rounded-md border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-800">Roadside</a>
+                            <a href="{{ route('rider.batteries.index') }}" class="inline-flex rounded-md border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-800">Battery</a>
+                            <a href="{{ route('rider.dealers.index') }}" class="inline-flex rounded-md border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-800">Dealerships</a>
+                            <a href="{{ route('rider.garage') }}" class="inline-flex rounded-md border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-800">Garage</a>
                         </div>
 
                         <div class="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-5 text-slate-950">
@@ -132,6 +188,16 @@
                                     {{ __('rider.delivery_application_optional') }}
                                 </a>
                             @endif
+                        </div>
+
+                        <div class="mt-4 rounded-lg border border-teal-200 bg-teal-50 p-5 text-slate-950">
+                            <p class="text-sm font-black uppercase text-teal-700">Provider applications</p>
+                            <p class="mt-3 text-sm leading-6 text-slate-700">
+                                Apply to become a seller, service center, roadside provider, delivery partner, or dealership. Admin approval is required before any provider dashboard opens.
+                            </p>
+                            <a href="{{ route('rider.provider-applications.index') }}" class="mt-5 inline-flex justify-center rounded-md bg-slate-950 px-5 py-3 text-sm font-black text-white transition hover:bg-slate-800">
+                                Apply as provider
+                            </a>
                         </div>
                     </section>
                 </div>

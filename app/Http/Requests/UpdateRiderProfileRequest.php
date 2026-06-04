@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Rider;
+use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -29,6 +30,14 @@ class UpdateRiderProfileRequest extends FormRequest
 
         return [
             'full_name' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'string',
+                'lowercase',
+                'email',
+                'max:255',
+                Rule::unique(User::class)->ignore($this->user()?->id),
+            ],
             'date_of_birth' => ['nullable', 'date', 'before_or_equal:today'],
             'current_address' => ['required', 'string', 'max:1000'],
             'phone_number' => [
@@ -54,6 +63,7 @@ class UpdateRiderProfileRequest extends FormRequest
     {
         return [
             'full_name' => 'الاسم الكامل',
+            'email' => 'البريد الإلكتروني',
             'date_of_birth' => 'تاريخ الميلاد',
             'current_address' => 'العنوان الحالي',
             'phone_number' => 'رقم الهاتف',
