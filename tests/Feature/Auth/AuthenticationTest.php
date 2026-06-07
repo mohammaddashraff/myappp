@@ -1,12 +1,13 @@
 <?php
 
-use App\Models\Driver;
 use App\Models\User;
 
 test('login screen can be rendered', function () {
     $response = $this->get('/login');
 
-    $response->assertStatus(200);
+    $response->assertStatus(200)
+        ->assertSee('auth-stage', false)
+        ->assertSee('button-brand', false);
 });
 
 test('users can authenticate using the login screen', function () {
@@ -18,23 +19,7 @@ test('users can authenticate using the login screen', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('rider.dashboard', absolute: false));
-});
-
-test('pending drivers are redirected to rider core after login', function () {
-    $user = User::factory()->create();
-
-    Driver::factory()->for($user)->create([
-        'approval_status' => 'pending',
-    ]);
-
-    $response = $this->post('/login', [
-        'email' => $user->email,
-        'password' => 'password',
-    ]);
-
-    $this->assertAuthenticated();
-    $response->assertRedirect(route('rider.dashboard', absolute: false));
+    $response->assertRedirect(route('dashboard', absolute: false));
 });
 
 test('users can not authenticate with invalid password', function () {

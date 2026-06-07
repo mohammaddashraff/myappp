@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Rider;
 use App\Models\User;
 use App\Support\AccessRoles;
 use Illuminate\Database\Seeder;
@@ -23,10 +22,6 @@ class AdminUserSeeder extends Seeder
             ],
         );
         $superAdmin->assignRole(AccessRoles::SUPER_ADMIN);
-        Rider::query()->firstOrCreate(
-            ['user_id' => $superAdmin->id],
-            ['full_name' => $superAdmin->name],
-        );
 
         $admin = User::updateOrCreate(
             ['email' => 'admin@example.com'],
@@ -36,9 +31,5 @@ class AdminUserSeeder extends Seeder
             ],
         );
         $admin->assignRole(AccessRoles::ADMIN);
-        Rider::query()->firstOrCreate(
-            ['user_id' => $admin->id],
-            ['full_name' => $admin->name],
-        );
     }
 }

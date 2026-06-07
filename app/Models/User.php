@@ -3,12 +3,12 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Support\AccessRoles;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -22,75 +22,98 @@ class User extends Authenticatable
     use HasFactory, HasRoles, Notifiable;
 
     /**
-     * @return HasOne<Driver, $this>
+     * @return HasOne<Subscription, $this>
      */
-    public function driverApplication(): HasOne
+    public function subscription(): HasOne
     {
-        return $this->hasOne(Driver::class);
+        return $this->hasOne(Subscription::class);
     }
 
     /**
-     * @return HasOne<Rider, $this>
+     * @return HasMany<Ad, $this>
      */
-    public function rider(): HasOne
+    public function ads(): HasMany
     {
-        return $this->hasOne(Rider::class);
+        return $this->hasMany(Ad::class);
     }
 
     /**
-     * @return HasMany<ProviderApplication, $this>
+     * @return HasMany<UserReview, $this>
      */
-    public function providerApplications(): HasMany
+    public function receivedReviews(): HasMany
     {
-        return $this->hasMany(ProviderApplication::class);
+        return $this->hasMany(UserReview::class, 'reviewed_user_id');
     }
 
     /**
-     * @return HasOne<SellerProfile, $this>
+     * @return HasMany<UserReview, $this>
      */
-    public function sellerProfile(): HasOne
+    public function givenReviews(): HasMany
     {
-        return $this->hasOne(SellerProfile::class);
+        return $this->hasMany(UserReview::class, 'reviewer_id');
     }
 
     /**
-     * @return HasOne<ServiceCenterProfile, $this>
+     * @return HasMany<AdInteraction, $this>
      */
-    public function serviceCenterProfile(): HasOne
+    public function adInteractions(): HasMany
     {
-        return $this->hasOne(ServiceCenterProfile::class);
+        return $this->hasMany(AdInteraction::class);
     }
 
-    /**
-     * @return HasOne<RoadsideProviderProfile, $this>
-     */
-    public function roadsideProviderProfile(): HasOne
+    public function activeSubscription(): ?Subscription
     {
-        return $this->hasOne(RoadsideProviderProfile::class);
+        $subscription = $this->relationLoaded('subscription')
+            ? $this->getRelation('subscription')
+            : $this->subscription;
+
+        return $subscription?->isActive() ? $subscription : null;
     }
 
-    /**
-     * @return HasOne<DeliveryPartnerProfile, $this>
-     */
-    public function deliveryPartnerProfile(): HasOne
+    public function hasActiveSubscription(): bool
     {
-        return $this->hasOne(DeliveryPartnerProfile::class);
+        return $this->activeSubscription() !== null;
     }
 
-    /**
-     * @return HasOne<DealershipProfile, $this>
-     */
-    public function dealershipProfile(): HasOne
+    public function publishedUnsoldAdsCount(): int
     {
-        return $this->hasOne(DealershipProfile::class);
+        return $this->ads()
+            ->where('status', Ad::STATUS_PUBLISHED)
+            ->whereNull('sold_at')
+            ->count();
     }
 
-    /**
-     * @return HasManyThrough<Motorcycle, Rider, $this>
-     */
-    public function motorcycles(): HasManyThrough
+    public function canPublishAds(): bool
     {
-        return $this->hasManyThrough(Motorcycle::class, Rider::class);
+        $subscription = $this->activeSubscription();
+
+        if ($subscription === null) {
+            return false;
+        }
+
+        return $this->publishedUnsoldAdsCount() < $subscription->planLimit();
+    }
+
+    public function canViewSellerContact(): bool
+    {
+        return $this->hasAnyRole([AccessRoles::SUPER_ADMIN, AccessRoles::ADMIN])
+            || $this->hasActiveSubscription();
+    }
+
+    public function averageRating(): ?float
+    {
+        $average = $this->relationLoaded('receivedReviews')
+            ? $this->receivedReviews->avg('rating')
+            : $this->receivedReviews()->avg('rating');
+
+        return $average === null ? null : round((float) $average, 1);
+    }
+
+    public function reviewsCount(): int
+    {
+        return $this->relationLoaded('receivedReviews')
+            ? $this->receivedReviews->count()
+            : $this->receivedReviews()->count();
     }
 
     /**

@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\Rider;
-
 test('registration screen can be rendered', function () {
     $response = $this->get('/register');
 
-    $response->assertStatus(200);
+    $response->assertStatus(200)
+        ->assertSee('auth-stage', false)
+        ->assertSee('button-brand', false);
 });
 
 test('new users can register', function () {
@@ -17,12 +17,9 @@ test('new users can register', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('rider.dashboard', absolute: false));
-
-    $this->assertDatabaseHas('riders', [
-        'full_name' => 'Test User',
+    $response->assertRedirect(route('dashboard', absolute: false));
+    $this->assertDatabaseHas('users', [
+        'name' => 'Test User',
+        'email' => 'test@example.com',
     ]);
-
-    expect(Rider::where('full_name', 'Test User')->first()?->user?->email)
-        ->toBe('test@example.com');
 });

@@ -9,6 +9,7 @@ $alignmentClasses = match ($align) {
 
 $width = match ($width) {
     '48' => 'w-48',
+    '56' => 'w-56',
     default => $width,
 };
 @endphp
@@ -28,7 +29,7 @@ $width = match ($width) {
             class="absolute z-50 mt-2 {{ $width }} rounded-md shadow-lg {{ $alignmentClasses }}"
             style="display: none;"
             @click="open = false">
-        <div class="rounded-md border border-slate-200 shadow-sm {{ $contentClasses }}">
+        <div class="rounded-md border border-slate-200 shadow-sm dark:border-slate-700 {{ $contentClasses }}">
             {{ $content }}
         </div>
     </div>

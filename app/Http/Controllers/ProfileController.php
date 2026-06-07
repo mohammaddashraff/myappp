@@ -16,8 +16,13 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $user = $request->user()->loadMissing('subscription');
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'profilePublishedAdsCount' => $user->publishedUnsoldAdsCount(),
+            'profilePublishedAdsLimit' => $user->activeSubscription()?->planLimit() ?? 0,
+            'subscription' => $user->subscription,
         ]);
     }
 

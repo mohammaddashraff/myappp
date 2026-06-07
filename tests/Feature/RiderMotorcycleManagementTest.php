@@ -1,193 +1,155 @@
 <?php
 
-use App\Models\Motorcycle;
-use App\Models\MotorcycleBrand;
-use App\Models\MotorcycleModel;
-use App\Models\Rider;
+use App\Models\Ad;
+use App\Models\Subscription;
 use App\Models\User;
-use Database\Seeders\MotorcycleBrandSeeder;
-use Database\Seeders\MotorcycleModelSeeder;
+use Database\Seeders\PermissionSeeder;
+use Database\Seeders\RoleSeeder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
-beforeEach(function (): void {
+beforeEach(function () {
     $this->seed([
-        MotorcycleBrandSeeder::class,
-        MotorcycleModelSeeder::class,
+        PermissionSeeder::class,
+        RoleSeeder::class,
     ]);
+
+    $this->withSession(['locale' => 'en']);
+    app()->setLocale('en');
 });
 
-test('rider can add a motorcycle with images and see it in the garage', function () {
+test('unsubscribed users are redirected to subscription when trying to create ads', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->get(route('ads.create'))
+        ->assertRedirect(route('subscriptions.show'));
+});
+
+test('subscribed users can open the create ad screen', function () {
+    $user = User::factory()->create();
+    Subscription::factory()->for($user)->create([
+        'status' => Subscription::STATUS_ACTIVE,
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('ads.create'))
+        ->assertOk()
+        ->assertSee('Create Ad');
+});
+
+test('subscribed users can attach multiple images to an ad', function () {
     Storage::fake('public');
 
     $user = User::factory()->create();
-    Rider::factory()->for($user)->create();
-
-    $brand = MotorcycleBrand::query()->where('name', 'SYM')->firstOrFail();
-    $model = MotorcycleModel::query()
-        ->where('brand_id', $brand->id)
-        ->where('name', 'Orbit')
-        ->firstOrFail();
-
-    $this->actingAs($user)
-        ->post(route('rider.motorcycles.store'), [
-            'type' => 'scooter',
-            'brand_id' => $brand->id,
-            'model_id' => $model->id,
-            'year' => 2024,
-            'engine_cc' => 150,
-            'plate_number' => 'RID-1001',
-            'color' => 'Blue',
-            'image' => UploadedFile::fake()->image('bike.jpg'),
-            'ownership_license_image' => UploadedFile::fake()->image('ownership.jpg'),
-            'motorcycle_registration_image' => UploadedFile::fake()->image('registration.jpg'),
-        ])
-        ->assertRedirect(route('rider.garage'))
-        ->assertSessionHas('status', 'motorcycle-added');
-
-    $motorcycle = Motorcycle::query()->where('plate_number', 'RID-1001')->firstOrFail();
-
-    expect($motorcycle->rider->user_id)->toBe($user->id)
-        ->and($motorcycle->brand)->toBe('SYM')
-        ->and($motorcycle->model)->toBe('Orbit')
-        ->and($motorcycle->type)->toBe('scooter');
-
-    Storage::disk('public')->assertExists($motorcycle->image);
-    Storage::disk('public')->assertExists($motorcycle->ownership_license_image);
-    Storage::disk('public')->assertExists($motorcycle->motorcycle_registration_image);
-
-    $this->actingAs($user)
-        ->get(route('rider.garage'))
-        ->assertOk()
-        ->assertSee('RID-1001')
-        ->assertSee('SYM')
-        ->assertSee('Orbit');
-});
-
-test('rider motorcycle form rejects unsupported three wheel types', function () {
-    $user = User::factory()->create();
-    Rider::factory()->for($user)->create();
-
-    $brand = MotorcycleBrand::query()->where('name', 'TVS')->firstOrFail();
-    $model = MotorcycleModel::query()
-        ->where('brand_id', $brand->id)
-        ->where('name', 'HLX')
-        ->firstOrFail();
-
-    $this->actingAs($user)
-        ->post(route('rider.motorcycles.store'), [
-            'type' => 'tricycle',
-            'brand_id' => $brand->id,
-            'model_id' => $model->id,
-            'year' => 2023,
-            'engine_cc' => 150,
-            'plate_number' => 'RID-1002',
-        ])
-        ->assertSessionHasErrors(['type']);
-
-    $this->assertDatabaseMissing('motorcycles', [
-        'plate_number' => 'RID-1002',
-    ]);
-});
-
-test('rider can update his motorcycle details', function () {
-    $user = User::factory()->create();
-    $rider = Rider::factory()->for($user)->create();
-
-    $brand = MotorcycleBrand::query()->where('name', 'Honda')->firstOrFail();
-    $oldModel = MotorcycleModel::query()
-        ->where('brand_id', $brand->id)
-        ->where('name', 'CBR')
-        ->firstOrFail();
-    $newModel = MotorcycleModel::query()
-        ->where('brand_id', $brand->id)
-        ->where('name', 'PCX')
-        ->firstOrFail();
-
-    $motorcycle = Motorcycle::factory()->for($rider)->create([
-        'brand_id' => $brand->id,
-        'model_id' => $oldModel->id,
-        'brand' => 'Honda',
-        'model' => 'CBR',
-        'type' => 'sport',
-        'plate_number' => 'RID-2001',
-        'engine_cc' => 150,
-        'color' => 'Black',
+    Subscription::factory()->for($user)->create([
+        'plan' => Subscription::PLAN_BUSINESS,
+        'status' => Subscription::STATUS_ACTIVE,
     ]);
 
     $this->actingAs($user)
-        ->patch(route('rider.motorcycles.update', $motorcycle), [
-            'type' => 'scooter',
-            'brand_id' => $brand->id,
-            'model_id' => $newModel->id,
-            'year' => 2025,
-            'engine_cc' => 160,
-            'plate_number' => 'RID-2001',
-            'color' => 'White',
+        ->post(route('ads.store'), [
+            'title' => 'BMW R nineT',
+            'description' => str_repeat('A', 255),
+            'category' => Ad::CATEGORY_MOTORCYCLE,
+            'price' => 450000,
+            'location' => 'Cairo',
+            'condition' => 'used',
+            'contact_phone' => '+201011111111',
+            'images' => [
+                UploadedFile::fake()->image('front.jpg'),
+                UploadedFile::fake()->image('side.png'),
+            ],
+            'status' => Ad::STATUS_PUBLISHED,
         ])
-        ->assertRedirect(route('rider.garage'))
-        ->assertSessionHas('status', 'motorcycle-updated');
+        ->assertRedirect();
 
-    $this->assertDatabaseHas('motorcycles', [
-        'id' => $motorcycle->id,
-        'model_id' => $newModel->id,
-        'model' => 'PCX',
-        'type' => 'scooter',
-        'year' => 2025,
-        'engine_cc' => 160,
-        'color' => 'White',
-    ]);
+    $ad = Ad::query()->whereBelongsTo($user)->firstOrFail();
+
+    expect($ad->images)->toHaveCount(2);
+
+    Storage::disk('public')->assertExists($ad->images[0]);
+    Storage::disk('public')->assertExists($ad->images[1]);
 });
 
-test('rider can delete his motorcycle', function () {
+test('new images are added to existing ad images until the image limit', function () {
     Storage::fake('public');
 
     $user = User::factory()->create();
-    $rider = Rider::factory()->for($user)->create();
+    Subscription::factory()->for($user)->create([
+        'plan' => Subscription::PLAN_BUSINESS,
+        'status' => Subscription::STATUS_ACTIVE,
+    ]);
 
-    $motorcycle = Motorcycle::factory()->for($rider)->create([
-        'plate_number' => 'RID-3001',
-        'image' => UploadedFile::fake()->image('bike.jpg')->store('motorcycles', 'public'),
+    $ad = Ad::factory()->for($user)->create([
+        'title' => 'Ducati Scrambler',
+        'images' => ['ads/existing.jpg'],
+        'status' => Ad::STATUS_DRAFT,
     ]);
 
     $this->actingAs($user)
-        ->delete(route('rider.motorcycles.destroy', $motorcycle))
-        ->assertRedirect(route('rider.garage'))
-        ->assertSessionHas('status', 'motorcycle-deleted');
+        ->patch(route('ads.update', $ad), [
+            'title' => 'Ducati Scrambler',
+            'description' => 'Clean bike with recent service.',
+            'category' => Ad::CATEGORY_MOTORCYCLE,
+            'price' => 380000,
+            'location' => 'Alexandria',
+            'condition' => 'used',
+            'contact_phone' => '+201011111111',
+            'images' => [
+                UploadedFile::fake()->image('new-angle.jpg'),
+            ],
+            'status' => Ad::STATUS_DRAFT,
+        ])
+        ->assertRedirect();
 
-    $this->assertDatabaseMissing('motorcycles', [
-        'id' => $motorcycle->id,
+    expect($ad->fresh()->images)->toHaveCount(2)
+        ->and($ad->fresh()->images[0])->toBe('ads/existing.jpg');
+
+    $ad->update([
+        'images' => [
+            'ads/1.jpg',
+            'ads/2.jpg',
+            'ads/3.jpg',
+            'ads/4.jpg',
+            'ads/5.jpg',
+            'ads/6.jpg',
+        ],
     ]);
+
+    $this->actingAs($user)
+        ->patch(route('ads.update', $ad), [
+            'title' => 'Ducati Scrambler',
+            'description' => 'Clean bike with recent service.',
+            'category' => Ad::CATEGORY_MOTORCYCLE,
+            'price' => 380000,
+            'location' => 'Alexandria',
+            'condition' => 'used',
+            'contact_phone' => '+201011111111',
+            'images' => [
+                UploadedFile::fake()->image('too-many.jpg'),
+            ],
+            'status' => Ad::STATUS_DRAFT,
+        ])
+        ->assertSessionHasErrors('images');
 });
 
-test('rider cannot view or edit another riders motorcycle', function () {
-    $owner = User::factory()->create();
-    $ownerRider = Rider::factory()->for($owner)->create();
-    $intruder = User::factory()->create();
-    Rider::factory()->for($intruder)->create();
-
-    $motorcycle = Motorcycle::factory()->for($ownerRider)->create([
-        'plate_number' => 'RID-4001',
-    ]);
-
-    $this->actingAs($intruder)
-        ->get(route('rider.motorcycles.show', $motorcycle))
-        ->assertNotFound();
-
-    $this->actingAs($intruder)
-        ->get(route('rider.motorcycles.edit', $motorcycle))
-        ->assertNotFound();
-});
-
-test('brand models endpoint returns models for the selected brand only', function () {
+test('ad description cannot exceed two hundred fifty five characters', function () {
     $user = User::factory()->create();
-    Rider::factory()->for($user)->create();
-
-    $brand = MotorcycleBrand::query()->where('name', 'Yamaha')->firstOrFail();
+    Subscription::factory()->for($user)->create([
+        'status' => Subscription::STATUS_ACTIVE,
+    ]);
 
     $this->actingAs($user)
-        ->getJson(route('rider.motorcycle-brands.models', $brand))
-        ->assertOk()
-        ->assertJsonFragment(['name' => 'R15'])
-        ->assertJsonMissing(['name' => 'Orbit']);
+        ->post(route('ads.store'), [
+            'title' => 'Too Long Description',
+            'description' => str_repeat('A', 256),
+            'category' => Ad::CATEGORY_PART,
+            'price' => 1200,
+            'location' => 'Giza',
+            'condition' => 'new',
+            'contact_phone' => '+201011111111',
+            'status' => Ad::STATUS_DRAFT,
+        ])
+        ->assertSessionHasErrors('description');
 });

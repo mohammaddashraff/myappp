@@ -1,3 +1,240 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    :root {
+        --page-ink: 15 23 42;
+        --page-muted: 71 85 105;
+        --page-line: 148 163 184;
+        --page-surface: 255 252 245;
+        --page-panel: 255 255 255;
+        --page-gold: 217 119 6;
+        --page-teal: 13 148 136;
+        --page-clay: 194 65 12;
+    }
+
+    body {
+        background-color: rgb(var(--page-surface));
+        color: rgb(var(--page-ink));
+    }
+
+    .dark body {
+        background-color: #020617;
+        color: #e2e8f0;
+    }
+}
+
+@layer components {
+    .page-shell {
+        @apply relative min-h-screen overflow-hidden bg-stone-50 text-slate-950;
+        background-image:
+            linear-gradient(90deg, rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+            linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+            linear-gradient(180deg, #fffdf7 0%, #f8fafc 48%, #eef2f7 100%);
+        background-size: 3rem 3rem, 3rem 3rem, auto;
+    }
+
+    .dark .page-shell {
+        @apply bg-slate-950 text-slate-100;
+        background-image:
+            linear-gradient(90deg, rgba(250, 204, 21, 0.06) 1px, transparent 1px),
+            linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+            radial-gradient(circle at top right, rgba(20, 184, 166, 0.16), transparent 32rem),
+            linear-gradient(180deg, #020617 0%, #0f172a 58%, #111827 100%);
+    }
+
+    .page-shell::before {
+        content: '';
+        @apply pointer-events-none absolute inset-x-0 top-0 h-40;
+        background-image: linear-gradient(180deg, rgba(250, 204, 21, 0.16), transparent);
+    }
+
+    .dark .page-shell::before {
+        background-image: linear-gradient(180deg, rgba(250, 204, 21, 0.08), transparent);
+    }
+
+    .page-grid {
+        background-image:
+            linear-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+        background-position: center;
+        background-size: 3.5rem 3.5rem;
+    }
+
+    .frame-panel {
+        @apply rounded-xl border border-slate-200 bg-white/95 shadow-sm backdrop-blur;
+    }
+
+    .dark .frame-panel {
+        @apply border-white/10 bg-slate-900/90 shadow-slate-950/30;
+    }
+
+    .frame-panel-strong {
+        @apply rounded-xl border border-slate-950 bg-slate-950 text-white shadow-xl shadow-slate-900/10;
+    }
+
+    .dark .frame-panel-strong {
+        @apply border-white/10 bg-black text-white shadow-black/30;
+    }
+
+    .section-label {
+        @apply text-xs font-black uppercase tracking-[0.28em] text-teal-700;
+    }
+
+    .dark .section-label {
+        @apply text-teal-300;
+    }
+
+    .editorial-kicker {
+        @apply inline-flex items-center gap-3 text-xs font-black uppercase tracking-[0.3em] text-slate-500;
+    }
+
+    .editorial-kicker::before {
+        content: '';
+        @apply h-px w-10 bg-slate-300;
+    }
+
+    .button-brand {
+        @apply inline-flex items-center justify-center rounded-lg bg-slate-950 px-5 py-3 text-sm font-black text-white transition hover:-translate-y-0.5 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2;
+    }
+
+    .dark .button-brand {
+        @apply bg-yellow-300 text-slate-950 hover:bg-yellow-200 focus:ring-yellow-300 focus:ring-offset-slate-950;
+    }
+
+    .button-accent {
+        @apply inline-flex items-center justify-center rounded-lg border border-slate-950/10 bg-yellow-300 px-5 py-3 text-sm font-black text-slate-950 transition hover:-translate-y-0.5 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2;
+    }
+
+    .button-muted {
+        @apply inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-950/20 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2;
+    }
+
+    .dark .button-muted {
+        @apply border-slate-700 bg-slate-900 text-slate-200 hover:border-slate-500 hover:text-white focus:ring-teal-300 focus:ring-offset-slate-950;
+    }
+
+    .input-surface {
+        @apply rounded-lg border-slate-300 bg-white px-4 py-3 text-slate-950 shadow-sm transition focus:border-teal-500 focus:ring-teal-500 disabled:bg-slate-100 disabled:text-slate-500;
+    }
+
+    .dark .input-surface {
+        @apply border-slate-700 bg-slate-950 text-slate-100 placeholder:text-slate-500 focus:border-teal-300 focus:ring-teal-300 disabled:bg-slate-900 disabled:text-slate-500;
+    }
+
+    .nav-pill {
+        @apply inline-flex items-center rounded-lg border px-4 py-2 text-sm font-bold transition;
+    }
+
+    .nav-pill-active {
+        @apply border-slate-950 bg-slate-950 text-white shadow-sm;
+    }
+
+    .dark .nav-pill-active {
+        @apply border-yellow-300 bg-yellow-300 text-slate-950;
+    }
+
+    .nav-pill-idle {
+        @apply border-transparent text-slate-600 hover:border-slate-300 hover:bg-white/80 hover:text-slate-950;
+    }
+
+    .dark .nav-pill-idle {
+        @apply text-slate-300 hover:border-slate-700 hover:bg-slate-900 hover:text-white;
+    }
+
+    .dashboard-stat {
+        @apply rounded-xl border border-slate-200/80 bg-white/95 p-4 shadow-sm;
+    }
+
+    .dark .dashboard-stat {
+        @apply border-white/10 bg-slate-900/90;
+    }
+
+    .dashboard-stat-dark {
+        @apply rounded-xl border border-white/10 bg-white/10 p-4;
+    }
+
+    .dashboard-card-title {
+        @apply text-sm font-bold text-slate-500;
+    }
+
+    .dark .dashboard-card-title {
+        @apply text-slate-400;
+    }
+
+    .moto-section {
+        @apply rounded-xl border border-slate-200 bg-white/95 shadow-sm;
+    }
+
+    .dark .moto-section {
+        @apply border-white/10 bg-slate-900/90 shadow-slate-950/30;
+    }
+
+    .moto-badge {
+        @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-black;
+    }
+
+    .moto-table-head {
+        @apply bg-slate-950 text-start text-xs font-black uppercase text-white;
+    }
+
+    .dark .moto-table-head {
+        @apply bg-black text-slate-100;
+    }
+}
+
+.dark .page-shell [class~="bg-white"] {
+    background-color: #0f172a;
+}
+
+.dark .page-shell [class~="bg-white/95"],
+.dark .page-shell [class~="bg-white/90"],
+.dark .page-shell [class~="bg-white/80"],
+.dark .page-shell [class~="bg-white/65"] {
+    background-color: rgb(15 23 42 / 0.9);
+}
+
+.dark .page-shell [class~="bg-stone-50"],
+.dark .page-shell [class~="bg-slate-50"] {
+    background-color: #020617;
+}
+
+.dark .page-shell [class~="bg-slate-100"],
+.dark .page-shell [class~="bg-slate-200"] {
+    background-color: #1e293b;
+}
+
+.dark .page-shell [class~="border-slate-200"],
+.dark .page-shell [class~="border-slate-300"] {
+    border-color: #334155;
+}
+
+.dark .page-shell [class~="divide-slate-100"] > :not([hidden]) ~ :not([hidden]),
+.dark .page-shell [class~="divide-slate-200"] > :not([hidden]) ~ :not([hidden]) {
+    border-color: #1e293b;
+}
+
+.dark .page-shell [class~="text-slate-950"],
+.dark .page-shell [class~="text-slate-900"],
+.dark .page-shell [class~="text-slate-800"] {
+    color: #f1f5f9;
+}
+
+.dark .page-shell [class~="text-slate-700"],
+.dark .page-shell [class~="text-slate-600"] {
+    color: #cbd5e1;
+}
+
+.dark .page-shell [class~="text-slate-500"] {
+    color: #94a3b8;
+}
+
+.dark .page-shell [class~="hover:bg-slate-50"]:hover,
+.dark .page-shell [class~="hover:bg-stone-50"]:hover {
+    background-color: #1e293b;
+}
+
+[x-cloak] {
+    display: none !important;
+}

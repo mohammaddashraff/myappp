@@ -1,18 +1,18 @@
 <section class="space-y-6">
     <header>
-        <h2 class="text-lg font-bold text-slate-950">
-            حذف الحساب
+        <h2 class="text-lg font-black text-rose-950">
+            {{ __('app.danger_zone') }}
         </h2>
 
-        <p class="mt-1 text-sm leading-6 text-slate-600">
-            عند حذف الحساب سيتم حذف كل البيانات المرتبطة به نهائيا. يرجى التأكد قبل المتابعة.
+        <p class="mt-1 text-sm leading-6 text-rose-900">
+            {{ __('app.delete_account_warning') }}
         </p>
     </header>
 
     <x-danger-button
         x-data=""
         x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
-    >حذف الحساب</x-danger-button>
+    >{{ __('app.delete_account') }}</x-danger-button>
 
     <x-modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable>
         <form method="post" action="{{ route('profile.destroy') }}" class="p-6">
@@ -20,22 +20,22 @@
             @method('delete')
 
             <h2 class="text-lg font-bold text-slate-950">
-                هل أنت متأكد من حذف الحساب؟
+                {{ __('app.confirm_delete_account') }}
             </h2>
 
             <p class="mt-1 text-sm leading-6 text-slate-600">
-                سيتم حذف الحساب وكل بياناته نهائيا. أدخل كلمة المرور لتأكيد الحذف.
+                {{ __('app.delete_account_prompt') }}
             </p>
 
             <div class="mt-6">
-                <x-input-label for="password" value="كلمة المرور" class="sr-only" />
+                <x-input-label for="password" :value="__('app.password')" class="sr-only" />
 
                 <x-text-input
                     id="password"
                     name="password"
                     type="password"
                     class="mt-1 block w-3/4"
-                    placeholder="كلمة المرور"
+                    :placeholder="__('app.password')"
                 />
 
                 <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
@@ -43,11 +43,11 @@
 
             <div class="mt-6 flex justify-end">
                 <x-secondary-button x-on:click="$dispatch('close')">
-                    إلغاء
+                    {{ __('app.cancel') }}
                 </x-secondary-button>
 
                 <x-danger-button class="ms-3">
-                    حذف الحساب
+                    {{ __('app.delete_account') }}
                 </x-danger-button>
             </div>
         </form>
